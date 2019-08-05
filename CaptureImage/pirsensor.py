@@ -11,6 +11,9 @@ import time
 import subprocess
 
 cmd = 'sh captureImage.sh'
+cmd_led_on = 'echo 1 > /sys/class/leds/led0/brightness'
+cmd_led_off = 'echo 0 > /sys/class/leds/led0/brightness'
+
 # set BCM_GPIO 17(GPIO 0) as PIR pin
 PIRPin = 17
 # set BCM_GPIO 18(GPIO 1) as buzzer pin
@@ -44,9 +47,13 @@ def setup():
 def main():
     #print info
     print_message()
+    isFiring = False
     while True:
         #read Sw520dPin's level
-        if(GPIO.input(PIRPin)!=0):
+        print (str(GPIO.input(PIRPin)))
+        if(isFiring == False and GPIO.input(PIRPin)!=0):
+            isFiring = True
+            subprocess.call(cmd_led_on, shell=True)
             GPIO.output(BuzzerPin,GPIO.LOW)
             #subprocess.check_call('pwd')
             #subprocess.check_call('ls')
@@ -57,14 +64,18 @@ def main():
             print ('*     alarm!     *')
             print ('********************')
             print ('\n')
-	    time.sleep(1)
-        else:
+            time.sleep(1)
+        elif(isFiring == True and GPIO.input(PIRPin)==0):
+            isFiring = False
+            subprocess.call(cmd_led_off, shell=True)
             GPIO.output(BuzzerPin,GPIO.HIGH)
             print ('====================')
             print ('=     Not alarm...  =')
             print ('====================')
             print ('\n')
-	    time.sleep(1)
+            time.sleep(1)
+        else:
+            time.sleep(1)
             
 
 #define a destroy function for clean up everything after the script finished
