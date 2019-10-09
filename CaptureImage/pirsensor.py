@@ -51,6 +51,9 @@ def main():
     checkInterval = 0.5
     isFiring = False
     keepingTime = 0
+    capturedCount = 0
+    nextTimeToCapture = 0
+    nextTimeMax = 60
     
     while True:
         #read Sw520dPin's level
@@ -64,13 +67,20 @@ def main():
             subprocess.call(cmd_capture, shell=True)
             #print (' Shot!!')
             keepingTime = 0
+            capturedCount = 1
+            nextTimeToCapture = 2 ** capturedCount * checkInterval
+            
             time.sleep(checkInterval)
             keepingTime = keepingTime + checkInterval
         elif(isFiring == True and GPIO.input(PIRPin)!=0):
-            if (keepingTime >= 1):
+            if (keepingTime >= nextTimeToCapture):
                 subprocess.call(cmd_capture, shell=True)
                 #print (' Shot!!')
                 keepingTime = 0
+                capturedCount = capturedCount + 1
+                nextTimeToCapture = 2 ** capturedCount * checkInterval
+                if (nextTimeToCapture > nextTimeMax):
+                    nextTimeToCapture = nextTimeMax
             
             time.sleep(checkInterval)
             keepingTime = keepingTime + checkInterval
