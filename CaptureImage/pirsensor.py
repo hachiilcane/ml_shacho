@@ -10,7 +10,10 @@ import RPi.GPIO as GPIO
 import time
 import subprocess
 
-cmd = 'sh captureImage.sh'
+cmd_capture = 'sh captureImage.sh'
+cmd_led_on = 'echo 1 > /sys/class/leds/led0/brightness'
+cmd_led_off = 'echo 0 > /sys/class/leds/led0/brightness'
+
 # set BCM_GPIO 17(GPIO 0) as PIR pin
 PIRPin = 17
 # set BCM_GPIO 18(GPIO 1) as buzzer pin
@@ -44,27 +47,42 @@ def setup():
 def main():
     #print info
     print_message()
+    
+    checkInterval = 0.5
+    isFiring = False
+    keepingTime = 0
+    
     while True:
         #read Sw520dPin's level
-        if(GPIO.input(PIRPin)!=0):
-            GPIO.output(BuzzerPin,GPIO.LOW)
-            #subprocess.check_call('pwd')
-            #subprocess.check_call('ls')
+        #print (str(GPIO.input(PIRPin)))
+        if(isFiring == False and GPIO.input(PIRPin)!=0):
+            isFiring = True
+            print ('== Detected!! ==\n')
+            subprocess.call(cmd_led_on, shell=True)
+            #GPIO.output(BuzzerPin,GPIO.LOW)
             # execute sh command as shell script
-            subprocess.call(cmd, shell=True)
-            #time.sleep(0.5)
-            print ('********************')
-            print ('*     alarm!     *')
-            print ('********************')
-            print ('\n')
-	    time.sleep(1)
+            subprocess.call(cmd_capture, shell=True)
+            #print (' Shot!!')
+            keepingTime = 0
+            time.sleep(checkInterval)
+            keepingTime = keepingTime + checkInterval
+        elif(isFiring == True and GPIO.input(PIRPin)!=0):
+            if (keepingTime >= 1):
+                subprocess.call(cmd_capture, shell=True)
+                #print (' Shot!!')
+                keepingTime = 0
+            
+            time.sleep(checkInterval)
+            keepingTime = keepingTime + checkInterval
+        elif(isFiring == True and GPIO.input(PIRPin)==0):
+            isFiring = False
+            print ('-- unDetected --\n')
+            subprocess.call(cmd_led_off, shell=True)
+            #GPIO.output(BuzzerPin,GPIO.HIGH)
+            #print ('====================')
+            time.sleep(checkInterval)
         else:
-            GPIO.output(BuzzerPin,GPIO.HIGH)
-            print ('====================')
-            print ('=     Not alarm...  =')
-            print ('====================')
-            print ('\n')
-	    time.sleep(1)
+            time.sleep(checkInterval)
             
 
 #define a destroy function for clean up everything after the script finished
