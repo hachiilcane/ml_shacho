@@ -84,7 +84,7 @@ def main():
             isFiring = False
             print ('-- unDetected --\n')
             subprocess.call(cmd_led_off, shell=True)
-            time.sleep(checkInterval)
+            time.sleep(checkInterval * 2)
         else:
             time.sleep(checkInterval)
             
