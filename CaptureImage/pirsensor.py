@@ -65,7 +65,7 @@ def main():
             subprocess.call(cmd_capture, shell=True)
             keepingTime = 0
             capturedCount = 1
-            nextTimeToCapture = 2 ** capturedCount * checkInterval
+            nextTimeToCapture = 2 * checkInterval
             
             time.sleep(checkInterval)
             keepingTime = keepingTime + checkInterval
@@ -74,7 +74,11 @@ def main():
                 subprocess.call(cmd_capture, shell=True)
                 keepingTime = 0
                 capturedCount = capturedCount + 1
-                nextTimeToCapture = 2 ** capturedCount * checkInterval
+                if (capturedCount <= 2):
+                    nextTimeToCapture = 2 * checkInterval
+                else:
+                    nextTimeToCapture = 2 ** (capturedCount - 1) * checkInterval
+                
                 if (nextTimeToCapture > nextTimeMax):
                     nextTimeToCapture = nextTimeMax
             
