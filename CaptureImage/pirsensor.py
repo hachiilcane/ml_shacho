@@ -21,16 +21,16 @@ BuzzerPin = 18
 
 #print message at the begining ---custom function
 def print_message():
-    print ('==================================')
-    print ('|              Alarm             |')
-    print ('|     -----------------------    |')
-    print ('|     PIR connect to GPIO0       |')
-    print ('|                                |')
-    print ('|     Buzzer connect to GPIO1    |')
-    print ('|     ------------------------   |')
-    print ('|                                |')
-    print ('|                          OSOYOO|')
-    print ('==================================\n')
+#    print ('==================================')
+#    print ('|              Alarm             |')
+#    print ('|     -----------------------    |')
+#    print ('|     PIR connect to GPIO0       |')
+#    print ('|                                |')
+#    print ('|     Buzzer connect to GPIO1    |')
+#    print ('|     ------------------------   |')
+#    print ('|                                |')
+#    print ('|                          OSOYOO|')
+#    print ('==================================\n')
     print ('Program is running...')
     print ('Please press Ctrl+C to end the program...')
 
@@ -62,10 +62,7 @@ def main():
             isFiring = True
             print ('== Detected!! ==\n')
             subprocess.call(cmd_led_on, shell=True)
-            #GPIO.output(BuzzerPin,GPIO.LOW)
-            # execute sh command as shell script
             subprocess.call(cmd_capture, shell=True)
-            #print (' Shot!!')
             keepingTime = 0
             capturedCount = 1
             nextTimeToCapture = 2 ** capturedCount * checkInterval
@@ -75,7 +72,6 @@ def main():
         elif(isFiring == True and GPIO.input(PIRPin)!=0):
             if (keepingTime >= nextTimeToCapture):
                 subprocess.call(cmd_capture, shell=True)
-                #print (' Shot!!')
                 keepingTime = 0
                 capturedCount = capturedCount + 1
                 nextTimeToCapture = 2 ** capturedCount * checkInterval
@@ -88,8 +84,6 @@ def main():
             isFiring = False
             print ('-- unDetected --\n')
             subprocess.call(cmd_led_off, shell=True)
-            #GPIO.output(BuzzerPin,GPIO.HIGH)
-            #print ('====================')
             time.sleep(checkInterval)
         else:
             time.sleep(checkInterval)
