@@ -48,7 +48,7 @@ def main():
     #print info
     print_message()
     
-    checkInterval = 0.5
+    checkInterval = 0.55
     isFiring = False
     keepingTime = 0
     capturedCount = 0
